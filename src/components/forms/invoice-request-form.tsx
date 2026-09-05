@@ -431,7 +431,9 @@ export function InvoiceRequestForm({
         <div className="flex flex-col gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between dark:bg-amber-950/30">
           <div>
             <p className="font-bold">فاکتور مشابه پیدا شد</p>
-            <p className="mt-1">اگر این خرید جداگانه است، ثبت آن را تأیید کنید.</p>
+            <p className="mt-1">
+              اگر این خرید جداگانه است، ثبت آن را تأیید کنید.
+            </p>
           </div>
           <Button
             type="button"

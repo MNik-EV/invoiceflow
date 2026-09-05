@@ -181,7 +181,9 @@ export function WebglAurora({ className }: { className?: string }) {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className={className ?? "pointer-events-none fixed inset-0 -z-10 h-full w-full"}
+      className={
+        className ?? "pointer-events-none fixed inset-0 -z-10 h-full w-full"
+      }
     />
   );
 }
