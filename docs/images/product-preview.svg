@@ -1,0 +1,52 @@
+<svg width="1440" height="820" viewBox="0 0 1440 820" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1440" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7ED"/><stop offset="1" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="1080" y1="92" x2="1290" y2="300" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FB923C"/><stop offset="1" stop-color="#EA580C"/>
+    </linearGradient>
+    <filter id="shadow" x="120" y="52" width="1200" height="720" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#431407" flood-opacity="0.12"/></filter>
+  </defs>
+  <rect width="1440" height="820" rx="28" fill="url(#bg)"/>
+  <circle cx="1300" cy="80" r="180" fill="#FED7AA" fill-opacity="0.55"/>
+  <circle cx="140" cy="760" r="210" fill="#FFEDD5"/>
+  <g filter="url(#shadow)">
+    <rect x="150" y="80" width="1140" height="660" rx="28" fill="white"/>
+    <rect x="150" y="80" width="252" height="660" rx="28" fill="#0F172A"/>
+    <path d="M374 80H402V740H374V80Z" fill="#0F172A"/>
+  </g>
+  <rect x="190" y="124" width="54" height="54" rx="16" fill="url(#orange)"/>
+  <path d="M205 140H225L233 148V164H205V140Z" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+  <text x="258" y="146" fill="white" font-size="22" font-family="Arial" font-weight="700">InvoiceFlow</text>
+  <text x="258" y="169" fill="#94A3B8" font-size="13" font-family="Arial">Invoice management</text>
+  <rect x="178" y="222" width="196" height="48" rx="14" fill="#EA580C"/>
+  <text x="224" y="252" fill="white" font-size="15" font-family="Arial" font-weight="700">Dashboard</text>
+  <text x="224" y="314" fill="#CBD5E1" font-size="15" font-family="Arial">New invoice</text>
+  <text x="224" y="374" fill="#CBD5E1" font-size="15" font-family="Arial">History</text>
+  <text x="224" y="434" fill="#CBD5E1" font-size="15" font-family="Arial">Bank profile</text>
+  <text x="1220" y="136" text-anchor="end" fill="#0F172A" font-size="30" font-family="Arial" font-weight="800">Invoice dashboard</text>
+  <text x="1220" y="168" text-anchor="end" fill="#64748B" font-size="15" font-family="Arial">Submit and follow every invoice in one place</text>
+  <rect x="438" y="208" width="368" height="142" rx="22" fill="url(#orange)"/>
+  <circle cx="752" cy="258" r="28" fill="white" fill-opacity="0.2"/>
+  <path d="M741 258H763M752 247V269" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <text x="474" y="252" fill="#FFEDD5" font-size="15" font-family="Arial">Team lunch</text>
+  <text x="474" y="291" fill="white" font-size="25" font-family="Arial" font-weight="800">Lunch invoice</text>
+  <text x="474" y="320" fill="#FFEDD5" font-size="14" font-family="Arial">Participants · allowance · receipt</text>
+  <rect x="828" y="208" width="392" height="142" rx="22" fill="#0F172A"/>
+  <circle cx="1166" cy="258" r="28" fill="#EA580C"/>
+  <path d="M1154 258H1178M1166 246V270" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <text x="864" y="252" fill="#FDBA74" font-size="15" font-family="Arial">Electronics &amp; lab</text>
+  <text x="864" y="291" fill="white" font-size="25" font-family="Arial" font-weight="800">Specialist purchase</text>
+  <text x="864" y="320" fill="#94A3B8" font-size="14" font-family="Arial">IC · MOSFET · module · PCB</text>
+  <rect x="438" y="382" width="782" height="288" rx="22" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="1178" y="426" text-anchor="end" fill="#0F172A" font-size="18" font-family="Arial" font-weight="700">Recent invoices</text>
+  <path d="M470 452H1188" stroke="#E2E8F0"/>
+  <g font-family="Arial" font-size="14">
+    <circle cx="492" cy="488" r="18" fill="#FFEDD5"/><text x="526" y="493" fill="#0F172A" font-weight="700">Lunch invoice</text><text x="808" y="493" fill="#64748B">1,400,000 toman</text><rect x="1060" y="472" width="104" height="30" rx="15" fill="#FEF3C7"/><text x="1112" y="492" text-anchor="middle" fill="#92400E">Pending</text>
+    <path d="M470 522H1188" stroke="#E2E8F0"/>
+    <circle cx="492" cy="560" r="18" fill="#E2E8F0"/><text x="526" y="565" fill="#0F172A" font-weight="700">Development modules</text><text x="808" y="565" fill="#64748B">8,750,000 toman</text><rect x="1060" y="544" width="104" height="30" rx="15" fill="#DCFCE7"/><text x="1112" y="564" text-anchor="middle" fill="#166534">Approved</text>
+    <path d="M470 594H1188" stroke="#E2E8F0"/>
+    <circle cx="492" cy="632" r="18" fill="#FFEDD5"/><text x="526" y="637" fill="#0F172A" font-weight="700">Sensor purchase</text><text x="808" y="637" fill="#64748B">3,200,000 toman</text><rect x="1060" y="616" width="104" height="30" rx="15" fill="#DBEAFE"/><text x="1112" y="636" text-anchor="middle" fill="#1E40AF">Paid</text>
+  </g>
+</svg>

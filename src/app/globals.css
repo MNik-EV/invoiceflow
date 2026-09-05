@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f8fa;
+  --foreground: #172033;
+  --card: #ffffff;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --primary: #ea580c;
+  --primary-foreground: #ffffff;
+  --danger: #b42318;
+  --radius: 0.875rem;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #07111f;
+  --foreground: #e8eef8;
+  --card: #0e1a2c;
+  --muted: #9bacbf;
+  --border: #26364c;
+  --primary: #fb923c;
+  --primary-foreground: #431407;
+  --danger: #fb7185;
+  color-scheme: dark;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 90% -10%,
+      rgb(249 115 22 / 10%),
+      transparent 34rem
+    ),
+    var(--background);
+  color: var(--foreground);
+  font-family: Vazirmatn, Tahoma, Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+.dark body {
+  background:
+    radial-gradient(
+      circle at 90% -10%,
+      rgb(251 146 60 / 14%),
+      transparent 34rem
+    ),
+    var(--background);
+}
+
+/* رنگ‌های پایه کامپوننت‌ها در تم تیره؛ تمام صفحه‌ها از یک زبان بصری پیروی می‌کنند. */
+.dark .bg-white,
+.dark .bg-white\/80 {
+  background-color: rgb(14 26 44 / 96%);
+}
+
+.dark .bg-slate-50,
+.dark .disabled\:bg-slate-100:disabled {
+  background-color: #111f33;
+}
+
+.dark .bg-slate-100 {
+  background-color: #17263b;
+}
+
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700 {
+  color: #e8eef8;
+}
+
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: #9bacbf;
+}
+
+.dark .text-slate-400 {
+  color: #7f90a6;
+}
+
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover {
+  background-color: #182940;
+}
+
+.dark .hover\:bg-orange-50:hover {
+  background-color: rgb(249 115 22 / 18%);
+}
+
+.dark .hover\:text-orange-800:hover {
+  color: #fdba74;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  caret-color: #fb923c;
+}
+
+.rmdp-container {
+  display: block !important;
+  width: 100%;
+}
+
+.rmdp-wrapper,
+.rmdp-calendar {
+  font-family: Vazirmatn, Tahoma, sans-serif !important;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgb(249 115 22 / 22%);
+}
+
+.orange .rmdp-week-day,
+.orange .rmdp-header-values {
+  color: #c2410c;
+}
+
+.orange .rmdp-day.rmdp-selected span:not(.highlight),
+.orange .rmdp-day:not(.rmdp-disabled):not(.rmdp-day-hidden) span:hover {
+  background-color: #ea580c;
+  color: #fff;
+}
+
+.orange .rmdp-day.rmdp-today span {
+  background-color: #fb923c;
+}
+
+@layer utilities {
+  .focus-ring {
+    @apply focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 focus-visible:outline-none;
+  }
+
+  .numeric {
+    direction: ltr;
+    font-variant-numeric: tabular-nums;
+  }
+}

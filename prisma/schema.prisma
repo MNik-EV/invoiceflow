@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  FINANCE_ADMIN
+  SUPER_ADMIN
+}
+
+enum InvoiceRequestStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum InvoiceCategory {
+  LUNCH
+  LAB_PURCHASE
+}
+
+enum LabPurchaseCategory {
+  IC
+  MOSFET
+  MODULE
+  SENSOR
+  PCB
+  TOOL
+  OTHER
+}
+
+enum AttachmentType {
+  INVOICE
+  PAYMENT_PROOF
+  FOOD_IMAGE
+  SUPPORTING_DOCUMENT
+}
+
+enum StorageStatus {
+  STAGED
+  AVAILABLE
+  STORAGE_ERROR
+  QUARANTINED
+}
+
+model User {
+  id                      String                 @id @default(uuid()) @db.Uuid
+  name                    String                 @db.VarChar(160)
+  username                String                 @unique @db.VarChar(80)
+  normalizedUsername      String                 @unique @map("normalized_username") @db.VarChar(80)
+  email                   String?                @unique @db.VarChar(254)
+  normalizedEmail         String?                @unique @map("normalized_email") @db.VarChar(254)
+  phone                   String?                @db.VarChar(20)
+  passwordHash            String?                @map("password_hash") @db.Text
+  role                    Role                   @default(USER)
+  bankCardNumberEncrypted String?                @map("bank_card_number_encrypted") @db.Text
+  bankCardLast4           String?                @map("bank_card_last4") @db.Char(4)
+  ibanEncrypted           String?                @map("iban_encrypted") @db.Text
+  encryptionKeyId         String?                @map("encryption_key_id") @db.VarChar(64)
+  isActive                Boolean                @default(true) @map("is_active")
+  createdAt               DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt               DateTime               @updatedAt @map("updated_at") @db.Timestamptz(3)
+  sessions                Session[]
+  externalIdentities      ExternalIdentity[]
+  invoiceRequests         InvoiceRequest[]       @relation("RequestCreator")
+  invoiceParticipations   InvoiceParticipant[]
+  uploadedAttachments     Attachment[]           @relation("AttachmentUploader")
+  paymentsRecorded        Payment[]              @relation("PaymentRecorder")
+  settingUpdates          SystemSetting[]        @relation("SettingUpdater")
+  settingRevisions        SettingRevision[]      @relation("SettingRevisionActor")
+  requestStatusChanges    RequestStatusHistory[] @relation("StatusChangeActor")
+  auditLogs               AuditLog[]
+
+  @@index([role, isActive], map: "users_role_active_idx")
+  @@map("users")
+}
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  provider  String    @default("local") @db.VarChar(80)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(3)
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt], map: "sessions_user_expiry_idx")
+  @@index([expiresAt, revokedAt], map: "sessions_cleanup_idx")
+  @@map("sessions")
+}
+
+model ExternalIdentity {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  provider  String   @db.VarChar(80)
+  subject   String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, subject], map: "external_identities_provider_subject_key")
+  @@index([userId], map: "external_identities_user_idx")
+  @@map("external_identities")
+}
+
+model InvoiceRequest {
+  id                       String                 @id @default(uuid()) @db.Uuid
+  creatorId                String                 @map("creator_id") @db.Uuid
+  category                 InvoiceCategory        @default(LUNCH)
+  invoiceDate              DateTime               @map("invoice_date") @db.Date
+  title                    String?                @db.VarChar(200)
+  vendorName               String?                @map("vendor_name") @db.VarChar(200)
+  purchaseCategory         LabPurchaseCategory?   @map("purchase_category")
+  invoiceAmount            BigInt                 @map("invoice_amount")
+  calculatedAmount         BigInt?                @map("calculated_amount")
+  allowancePerParticipant  BigInt?                @map("allowance_per_participant")
+  approvedParticipantCount Int?                   @map("approved_participant_count")
+  status                   InvoiceRequestStatus   @default(PENDING_REVIEW)
+  description              String?                @db.VarChar(2000)
+  rejectionReason          String?                @map("rejection_reason") @db.VarChar(1000)
+  duplicateConfirmed       Boolean                @default(false) @map("duplicate_confirmed")
+  version                  Int                    @default(1)
+  submittedAt              DateTime               @default(now()) @map("submitted_at") @db.Timestamptz(3)
+  createdAt                DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                DateTime               @updatedAt @map("updated_at") @db.Timestamptz(3)
+  creator                  User                   @relation("RequestCreator", fields: [creatorId], references: [id], onDelete: Restrict)
+  participants             InvoiceParticipant[]
+  attachments              Attachment[]
+  payment                  Payment?
+  statusHistory            RequestStatusHistory[]
+
+  @@index([status, invoiceDate(sort: Desc)], map: "invoice_requests_status_date_idx")
+  @@index([creatorId, invoiceDate(sort: Desc)], map: "invoice_requests_creator_date_idx")
+  @@index([category, invoiceDate(sort: Desc)], map: "invoice_requests_category_date_idx")
+  @@map("invoice_requests")
+}
+
+model InvoiceParticipant {
+  id        String       @id @default(uuid()) @db.Uuid
+  requestId String       @map("request_id") @db.Uuid
+  userId    String       @map("user_id") @db.Uuid
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  request   InvoiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([requestId, userId], map: "invoice_participants_request_user_key")
+  @@index([userId, requestId], map: "invoice_participants_user_request_idx")
+  @@map("invoice_participants")
+}
+
+model Attachment {
+  id            String         @id @default(uuid()) @db.Uuid
+  requestId     String         @map("request_id") @db.Uuid
+  type          AttachmentType
+  storageStatus StorageStatus  @default(STAGED) @map("storage_status")
+  storageKey    String         @unique @map("storage_key") @db.VarChar(600)
+  originalName  String         @map("original_name") @db.VarChar(255)
+  mediaType     String         @map("media_type") @db.VarChar(100)
+  byteSize      BigInt         @map("byte_size")
+  sha256        String         @db.Char(64)
+  uploadedById  String         @map("uploaded_by") @db.Uuid
+  uploadedAt    DateTime       @default(now()) @map("uploaded_at") @db.Timestamptz(3)
+  request       InvoiceRequest @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  uploadedBy    User           @relation("AttachmentUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@index([requestId, type, storageStatus], map: "attachments_request_type_status_idx")
+  @@index([sha256], map: "attachments_sha256_idx")
+  @@map("attachments")
+}
+
+model Payment {
+  id           String       @id @default(uuid()) @db.Uuid
+  requestId    String       @unique @map("request_id") @db.Uuid
+  amount       BigInt
+  paidById     String       @map("paid_by") @db.Uuid
+  paidOn       DateTime     @map("paid_on") @db.Date
+  trackingCode String       @map("tracking_code") @db.VarChar(120)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  request      InvoiceRequest @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  paidBy       User         @relation("PaymentRecorder", fields: [paidById], references: [id], onDelete: Restrict)
+
+  @@index([paidOn], map: "payments_paid_on_idx")
+  @@index([trackingCode], map: "payments_tracking_code_idx")
+  @@map("payments")
+}
+
+model SystemSetting {
+  id          String            @id @default(uuid()) @db.Uuid
+  key         String            @unique @db.VarChar(120)
+  value       Json
+  valueType   String            @map("value_type") @db.VarChar(40)
+  version     Int               @default(1)
+  updatedAt   DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedById String?           @map("updated_by") @db.Uuid
+  updatedBy   User?             @relation("SettingUpdater", fields: [updatedById], references: [id], onDelete: Restrict)
+  revisions   SettingRevision[]
+
+  @@map("system_settings")
+}
+
+model SettingRevision {
+  id          String        @id @default(uuid()) @db.Uuid
+  settingId   String        @map("setting_id") @db.Uuid
+  oldValue    Json?         @map("old_value")
+  newValue    Json          @map("new_value")
+  changedById String?       @map("changed_by") @db.Uuid
+  changedAt   DateTime      @default(now()) @map("changed_at") @db.Timestamptz(3)
+  setting     SystemSetting @relation(fields: [settingId], references: [id], onDelete: Restrict)
+  changedBy   User?         @relation("SettingRevisionActor", fields: [changedById], references: [id], onDelete: Restrict)
+
+  @@index([settingId, changedAt(sort: Desc)], map: "setting_revisions_setting_date_idx")
+  @@map("setting_revisions")
+}
+
+model RequestStatusHistory {
+  id          String              @id @default(uuid()) @db.Uuid
+  requestId   String              @map("request_id") @db.Uuid
+  fromStatus  InvoiceRequestStatus? @map("from_status")
+  toStatus    InvoiceRequestStatus  @map("to_status")
+  changedById String              @map("changed_by") @db.Uuid
+  reason      String?             @db.VarChar(1000)
+  metadata    Json?
+  changedAt   DateTime            @default(now()) @map("changed_at") @db.Timestamptz(3)
+  request     InvoiceRequest      @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  changedBy   User                @relation("StatusChangeActor", fields: [changedById], references: [id], onDelete: Restrict)
+
+  @@index([requestId, changedAt(sort: Desc)], map: "request_status_history_request_date_idx")
+  @@index([changedById, changedAt(sort: Desc)], map: "request_status_history_actor_date_idx")
+  @@map("request_status_history")
+}
+
+model AuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String?  @map("user_id") @db.Uuid
+  action        String   @db.VarChar(120)
+  entity        String   @db.VarChar(100)
+  entityId      String?  @map("entity_id") @db.Uuid
+  metadata      Json     @default("{}")
+  correlationId String   @map("correlation_id") @db.VarChar(100)
+  ipHash        String?  @map("ip_hash") @db.Char(64)
+  timestamp     DateTime @default(now()) @db.Timestamptz(3)
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId, timestamp(sort: Desc)], map: "audit_logs_entity_date_idx")
+  @@index([userId, timestamp(sort: Desc)], map: "audit_logs_user_date_idx")
+  @@index([action, timestamp(sort: Desc)], map: "audit_logs_action_date_idx")
+  @@map("audit_logs")
+}
+
+model AuthThrottle {
+  id              String    @id @default(uuid()) @db.Uuid
+  keyHash         String    @unique @map("key_hash") @db.Char(64)
+  failureCount    Int       @default(0) @map("failure_count")
+  windowStartedAt DateTime  @default(now()) @map("window_started_at") @db.Timestamptz(3)
+  lockedUntil     DateTime? @map("locked_until") @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([updatedAt], map: "auth_throttles_cleanup_idx")
+  @@map("auth_throttles")
+}

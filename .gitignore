@@ -1,0 +1,30 @@
+# dependencies and builds
+/node_modules
+/.next
+/out
+/coverage
+/playwright-report
+/test-results
+/.local
+
+# private data and secrets
+.env
+.env.*
+!.env.example
+/storage/*
+!/storage/.gitkeep
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+
+# logs
+*.log
+npm-debug.log*
+*.tsbuildinfo
+
+# generated Prisma client state
+*.db
+*.db-journal
